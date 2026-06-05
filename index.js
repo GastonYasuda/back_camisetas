@@ -9,6 +9,7 @@ app.get("/", (req, res) => {
     res.send("API funcionando");
 });
 
+
 app.get("/camisetas", async (req, res) => {
     try {
         const resultado = await pool.query(
