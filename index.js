@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 app.get("/camisetas", async (req, res) => {
     try {
         const resultado = await pool.query(
-            "SELECT * FROM public.camisetas"
+            "SELECT * FROM camisetas"
         );
 
         res.json(resultado.rows);
