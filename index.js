@@ -25,6 +25,23 @@ app.get("/camisetas", async (req, res) => {
     }
 });
 
+app.get("/camisetas/:id_camiseta", (req, res) => {
+    const id = req.params.id_camiseta;
+    console.log('estoy andando');
+
+    if (id !== '') {
+        const camisetaEncontrada = camisetas.find((camiseta) => {
+            camiseta.id_camiseta === id
+        })
+        if (camisetaEncontrada) {
+            res.status(200), json(camisetaEncontrada)
+        } else {
+            res.status(404).json({ message: "Camiseta no encontrada" })
+        }
+
+    }
+})
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
