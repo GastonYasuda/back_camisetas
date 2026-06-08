@@ -116,7 +116,7 @@ app.patch("/camisetas/:id", async (req, res) => {
             `UPDATE camisetas
                 SET nombre = COALESCE($1,nombre),
                     categoria = COALESCE ($2, categoria),
-                    stock = COALESCE ($3, stock)
+                    stock = COALESCE ($3, stock),
                     precio = COALESCE ($4, precio)
                 
                 WHERE id_camiseta = $5
