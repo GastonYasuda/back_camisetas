@@ -58,3 +58,36 @@ app.get("/camisetas/:id", async (req, res) => {
         });
     }
 });
+
+
+//POST un nuevo producto
+app.post("/camisetas", async (req, res) => {
+    try {
+
+        const {
+            nombre,
+            precio,
+            categoria,
+            imagen
+        } = req.body;
+
+        const resultado = await pool.query(
+            `INSERT INTO camisetas
+            (nombre, precio, categoria, imagen)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *`,
+            [nombre, precio, categoria, imagen]
+        );
+
+        res.status(201).json({
+            message: "Camiseta creada correctamente",
+            camiseta: resultado.rows[0]
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: error.message
+        });
+    }
+});
