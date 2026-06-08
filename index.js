@@ -1,9 +1,4 @@
 require("dotenv").config();
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
-
-console.log(process.env.DATABASE_URL);
-
-
 
 const express = require("express");
 const pool = require("./db");
@@ -16,18 +11,11 @@ app.listen(PORT, () => {
 });
 
 
-app.get("/debug", (req, res) => {
-    res.json({
-        databaseUrl: process.env.DATABASE_URL
-    });
-});
-
-
 app.get("/", (req, res) => {
     res.status(200).send({ message: "API funcionando" });
 });
 
-
+//GET todas las camisetas
 app.get("/camisetas", async (req, res) => {
     try {
         const resultado = await pool.query(
@@ -45,19 +33,28 @@ app.get("/camisetas", async (req, res) => {
     }
 });
 
-// app.get("/camisetas/:id_camiseta", (req, res) => {
-//     const id = req.params.id_camiseta;
-//     console.log('estoy andando');
+//GET una camiseta
+app.get("/camisetas/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
 
-//     if (id !== '') {
-//         const camisetaEncontrada = camisetas.find(
-//             (camiseta) => camiseta.id_camiseta === id
-//         )
-//         if (camisetaEncontrada) {
-//             res.status(200).json(camisetaEncontrada)
-//         } else {
-//             res.status(404).json({ message: "Camiseta no encontrada" })
-//         }
-//     }
-// })
+        const resultado = await pool.query(
+            "SELECT * FROM camisetas WHERE id_camiseta = $1",
+            [id]
+        );
 
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
+                mensaje: "Camiseta no encontrada"
+            });
+        }
+
+        res.json(resultado.rows[0]);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: error.message
+        });
+    }
+});
