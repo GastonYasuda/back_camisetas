@@ -105,36 +105,65 @@ app.post("/camisetas", async (req, res) => {
 });
 
 //PATCH valor de una camiseta
-
 app.patch("/camisetas/:id", async (req, res) => {
     try {
-        const { id } = Number(req.params.id);
+        const id = Number(req.params.id);
 
         const { nombre, categoria, stock, precio } = req.body;
 
         const resultado = await pool.query(
             `UPDATE camisetas
-                SET nombre = COALESCE($1,nombre),
-                    categoria = COALESCE ($2, categoria),
-                    stock = COALESCE ($3, stock),
-                    precio = COALESCE ($4, precio)
-                
-                WHERE id_camiseta = $5
-                RETURNING *`,
-            [nombre, categoria, stock, precio]
+       SET nombre = COALESCE($1, nombre),
+           categoria = COALESCE($2, categoria),
+           stock = COALESCE($3, stock),
+           precio = COALESCE($4, precio)
+       WHERE id_camiseta = $5
+       RETURNING *`,
+            [nombre, categoria, stock, precio, id]
         );
 
-        if (resultado.rows.lenth === 0) {
-            return res.status(400).json({
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
                 error: "Camiseta no encontrada"
-            })
+            });
         }
+
+        res.status(200).json({
+            mensaje: "Camiseta editada correctamente"
+        });
 
         res.json(resultado.rows[0]);
 
     } catch (error) {
         res.status(500).json({
             error: error.message
-        })
+        });
+    }
+});
+
+//DELETE una camiseta
+app.delete("/camisetas/:id_camiseta", async (req, res) => {
+
+    try {
+        const { id_camiseta } = req.params;
+        const resultado = await pool.query(
+            `DELETE FROM camisetas WHERE id_camiseta=$1`,
+            [id_camiseta]
+        );
+
+        if (resultado.rowCount === 0) {
+            return res.status(404).json({
+                error: "Camiseta no encontrada"
+            });
+        }
+
+        res.status(200).json({
+            mensaje: "Camiseta eliminada correctamente"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        });
     }
 })
