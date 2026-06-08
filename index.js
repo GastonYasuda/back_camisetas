@@ -60,23 +60,23 @@ app.get("/camisetas/:id", async (req, res) => {
 });
 
 
-//POST un nuevo producto
+//POST una nueva camiseta
 app.post("/camisetas", async (req, res) => {
     try {
 
         const {
             nombre,
-            precio,
             categoria,
-            imagen
+            stock,
+            precio
         } = req.body;
 
         const resultado = await pool.query(
             `INSERT INTO camisetas
-            (nombre, precio, categoria, imagen)
+            (nombre, categoria, stock, precio)
             VALUES ($1, $2, $3, $4)
             RETURNING *`,
-            [nombre, precio, categoria, imagen]
+            [nombre, categoria, stock, precio]
         );
 
         res.status(201).json({
