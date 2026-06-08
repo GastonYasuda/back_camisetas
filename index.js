@@ -13,6 +13,15 @@ app.listen(PORT, () => {
     console.log(`Servidor iniciado en puerto ${PORT}`);
 });
 
+// app.get("/test-db", async (req, res) => {
+//     try {
+//         const resultado = await pool.query("SELECT NOW()");
+//         res.json(resultado.rows);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// });
+
 
 app.get("/", (req, res) => {
     res.status(200).send({ message: "API funcionando" });
@@ -94,3 +103,38 @@ app.post("/camisetas", async (req, res) => {
         });
     }
 });
+
+//PATCH valor de una camiseta
+
+app.patch("/camisetas/:id", async (req, res) => {
+    try {
+        const { id } = Number(req.params.id);
+
+        const { nombre, categoria, stock, precio } = req.body;
+
+        const resultado = await pool.query(
+            `UPDATE camisetas
+                SET nombre = COALESCE($1,nombre),
+                    categoria = COALESCE ($2, categoria),
+                    stock = COALESCE ($3, stock)
+                    precio = COALESCE ($4, precio)
+                
+                WHERE id_camiseta = $5
+                RETURNING *`,
+            [nombre, categoria, stock, precio]
+        );
+
+        if (resultado.rows.lenth === 0) {
+            return res.status(400).json({
+                error: "Camiseta no encontrada"
+            })
+        }
+
+        res.json(resultado.rows[0]);
+
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+})
