@@ -5,7 +5,7 @@ const pool = require("./db");
 
 const app = express();
 
-//Middleware
+//MIDDLEWARE
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
@@ -13,16 +13,8 @@ app.listen(PORT, () => {
     console.log(`Servidor iniciado en puerto ${PORT}`);
 });
 
-// app.get("/test-db", async (req, res) => {
-//     try {
-//         const resultado = await pool.query("SELECT NOW()");
-//         res.json(resultado.rows);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
 
-
+//RUTA DEL SERVIRVIDOR WEB
 app.get("/", (req, res) => {
     res.status(200).send({ message: "API funcionando" });
 });
@@ -44,6 +36,37 @@ app.get("/camisetas", async (req, res) => {
         });
     }
 });
+
+//FILTRAR POR CATEGORIAS
+app.get("/camisetas/categoria/:cate", async (req, res) => {
+    try {
+        const cate = req.params.cate?.trim().toLocaleLowerCase();
+
+        if (cate) {
+            const productosFiltrados = camisetas.filter((prods) => prods.categoria.toLocaleLowerCase().includes(cate))
+
+            if (productosFiltrados.length > 0) {
+                res.status(200).json(productosFiltrados)
+            } else {
+                res.status(404).json({
+                    message: `No hay productos en esta categoria ${cate}`
+                })
+            }
+        } else {
+            res.status(400).json({
+                message: "Debe escribir la categoria a filtrar"
+            })
+        }
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: error.message
+        });
+    }
+
+})
 
 //GET una camiseta
 app.get("/camisetas/:id", async (req, res) => {
