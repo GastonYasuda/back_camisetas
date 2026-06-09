@@ -42,22 +42,28 @@ app.get("/camisetas/categoria/:cate", async (req, res) => {
     try {
         const cate = req.params.cate?.trim().toLocaleLowerCase();
 
-        if (cate) {
-            const productosFiltrados = camisetas.filter((prods) => prods.categoria.toLocaleLowerCase().includes(cate))
+        if (!cate) {
 
-            if (productosFiltrados.length > 0) {
-                res.status(200).json(productosFiltrados)
-            } else {
-                res.status(404).json({
-                    message: `No hay productos en esta categoria ${cate}`
-                })
-            }
-        } else {
-            res.status(400).json({
-                message: "Debe escribir la categoria a filtrar"
-            })
+            return res.status(400).json({
+                message: "Debe escribir la categoría a filtrar"
+            });
+
+        }
+        const resultado = await pool.query(
+            `SELECT * FROM camisetas WHERE LOWER(categoria) = $1`,
+            [cate]
+        );
+
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
+                message: `No hay productos en la categoría: ${cate}`
+            });
         }
 
+        res.status(200).json({
+            message: "Camisetas filtradas correctamente",
+            camisetas: resultado.rows
+        });
 
     } catch (error) {
         console.error(error);
@@ -65,6 +71,7 @@ app.get("/camisetas/categoria/:cate", async (req, res) => {
             error: error.message
         });
     }
+
 
 })
 
