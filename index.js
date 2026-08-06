@@ -6,7 +6,14 @@ const pool = require("./db");
 const app = express();
 
 //MIDDLEWARE
-app.use(express.json());
+app.use(
+    cors({
+        origin: [
+            "http://localhost:5173",
+            "https://tu-frontend.vercel.app",
+        ],
+    })
+);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
